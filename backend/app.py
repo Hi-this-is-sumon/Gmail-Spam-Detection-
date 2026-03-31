@@ -1,7 +1,8 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 import pickle
 import pandas as pd
 import re
@@ -26,149 +27,16 @@ base_dir = os.path.dirname(os.path.abspath(__file__))
 model_path = os.path.join(base_dir, "model/spam_model.pkl")
 vectorizer_path = os.path.join(base_dir, "model/vectorizer.pkl")
 whitelist_path = os.path.join(base_dir, "data/trusted_domains.csv")
+landing_page_path = os.path.join(base_dir, "templates", "index.html")
+static_dir = os.path.join(base_dir, "static")
+
+app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
 model = None
 vectorizer = None
 trusted_domains = set()
 ps = PorterStemmer()
 STOPWORDS = set(ENGLISH_STOP_WORDS)
-
-INSTALL_PAGE_HTML = """
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Gmail Spam Detection</title>
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #081120, #142b4d, #1d4ed8);
-            color: #ffffff;
-            line-height: 1.6;
-        }
-        .container {
-            width: 100%;
-            max-width: 900px;
-            margin: 0 auto;
-            padding: clamp(16px, 4vw, 48px) clamp(14px, 3vw, 20px);
-        }
-        .card {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 18px;
-            padding: clamp(16px, 3vw, 24px);
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-        }
-        h1 {
-            font-size: clamp(1.8rem, 4vw, 2.6rem);
-            line-height: 1.2;
-            margin-top: 0;
-        }
-        h2 {
-            font-size: clamp(1.2rem, 3vw, 1.6rem);
-            margin-top: 0;
-        }
-        p, li {
-            font-size: clamp(0.95rem, 2vw, 1rem);
-        }
-        .buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-top: 16px;
-        }
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 44px;
-            padding: 12px 18px;
-            border-radius: 10px;
-            background: #22c55e;
-            color: #081120;
-            text-decoration: none;
-            font-weight: bold;
-            text-align: center;
-        }
-        .btn.secondary {
-            background: #e2e8f0;
-        }
-        ol, ul {
-            line-height: 1.8;
-            padding-left: 20px;
-        }
-        code {
-            background: rgba(0, 0, 0, 0.25);
-            padding: 2px 6px;
-            border-radius: 6px;
-            word-break: break-word;
-        }
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px 14px;
-            }
-            .card {
-                border-radius: 14px;
-            }
-        }
-        @media (max-width: 480px) {
-            .buttons {
-                flex-direction: column;
-            }
-            .btn {
-                width: 100%;
-            }
-            ol, ul {
-                padding-left: 18px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="card">
-            <h1>📧 Gmail Spam Detection</h1>
-            <p>AI-powered Chrome extension for detecting spam emails in Gmail.</p>
-            <p><strong>No login or registration required.</strong></p>
-            <div class="buttons">
-                <a class="btn" href="https://github.com/Hi-this-is-sumon/Gmail-Spam-Detection-/archive/refs/heads/main.zip">Download ZIP</a>
-                <a class="btn secondary" href="https://github.com/Hi-this-is-sumon/Gmail-Spam-Detection-">GitHub Repo</a>
-                <a class="btn secondary" href="/docs">API Docs</a>
-            </div>
-        </div>
-
-        <div class="card">
-            <h2>🚀 Install in Chrome</h2>
-            <ol>
-                <li>Download and extract the ZIP file.</li>
-                <li>Open <code>chrome://extensions/</code> in Chrome.</li>
-                <li>Turn on <strong>Developer mode</strong>.</li>
-                <li>Click <strong>Load unpacked</strong>.</li>
-                <li>Select the <code>extension</code> folder.</li>
-                <li>Pin the extension and start using it in Gmail.</li>
-            </ol>
-        </div>
-
-        <div class="card">
-            <h2>📝 How to Use</h2>
-            <ul>
-                <li>Open any email in Gmail.</li>
-                <li>Click the extension icon.</li>
-                <li>Use <strong>Get from Gmail</strong> or paste email text manually.</li>
-                <li>Click <strong>Analyze</strong> to detect spam.</li>
-            </ul>
-        </div>
-    </div>
-</body>
-</html>
-"""
-
 
 def load_resources():
     global model, vectorizer, trusted_domains
@@ -277,9 +145,9 @@ def has_spam_indicators(subject, body):
     # If 2+ strong spam indicators, definitely spam
     return spam_count >= 2
 
-@app.get("/", response_class=HTMLResponse)
+@app.get("/", response_class=FileResponse)
 def home():
-    return INSTALL_PAGE_HTML
+    return FileResponse(landing_page_path)
 
 
 @app.get("/health")
