@@ -2,7 +2,7 @@
 
 AI-powered spam detection system for Gmail with a modern, animated Chrome extension and Python backend.
 
-**Live API:** `https://gmail-spam-detection-nine.vercel.app/`
+**Live Site / API:** [https://gmail-spam-detection-nine.vercel.app/](https://gmail-spam-detection-nine.vercel.app/)
 
 **Last Updated:** March 31, 2026
 
@@ -38,10 +38,10 @@ Normal users do **not** need to run Python locally. The backend is already deplo
 
 ### Install the Chrome Extension
 
-1. Open the GitHub repository: `https://github.com/Hi-this-is-sumon/Gmail-Spam-Detection-`
-2. Click **Code** → **Download ZIP**
+1. Open the live install page: [gmail-spam-detection-nine.vercel.app](https://gmail-spam-detection-nine.vercel.app/)
+2. Click **Download ZIP**
 3. Extract the ZIP file on your computer
-4. Open Chrome and go to `chrome://extensions/`
+4. Open Chrome and go to **[chrome://extensions/](chrome://extensions/)**
 5. Turn on **Developer mode**
 6. Click **Load unpacked**
 7. Select the `extension` folder from the extracted project
@@ -94,7 +94,7 @@ python model/train_model.py
 python app.py
 ```
 
-Server will run on `http://127.0.0.1:8000`
+Server will run on [http://127.0.0.1:8000](http://127.0.0.1:8000)
 
 ### Extension Setup
 
