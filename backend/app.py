@@ -4,9 +4,8 @@ from fastapi.middleware.cors import CORSMiddleware
 import pickle
 import pandas as pd
 import re
-import nltk
-from nltk.corpus import stopwords
 from nltk.stem.porter import PorterStemmer
+from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
 import os
 
 # Initialize App
@@ -30,37 +29,44 @@ whitelist_path = os.path.join(base_dir, "data/trusted_domains.csv")
 model = None
 vectorizer = None
 trusted_domains = set()
-
-# Ensure NLTK data is downloaded
-nltk.download('stopwords')
 ps = PorterStemmer()
+STOPWORDS = set(ENGLISH_STOP_WORDS)
+
 
 def load_resources():
     global model, vectorizer, trusted_domains
-    if os.path.exists(model_path) and os.path.exists(vectorizer_path):
-        model = pickle.load(open(model_path, "rb"))
-        vectorizer = pickle.load(open(vectorizer_path, "rb"))
-    else:
-        print("Model or vectorizer not found. Please train the model first.")
-    
-    if os.path.exists(whitelist_path):
-        # Read CSV with no header, assuming first column is domain
-        df = pd.read_csv(whitelist_path, header=None)
-        if not df.empty:
-            trusted_domains = set(df[0].astype(str).str.lower().values)
-    else:
-        print("Trusted domains file not found.")
 
-print("DEBUG: Calling load_resources...")
+    try:
+        if os.path.exists(model_path) and os.path.exists(vectorizer_path):
+            with open(model_path, "rb") as model_file:
+                model = pickle.load(model_file)
+            with open(vectorizer_path, "rb") as vectorizer_file:
+                vectorizer = pickle.load(vectorizer_file)
+        else:
+            print("Model or vectorizer not found. Please train the model first.")
+    except Exception as exc:
+        model = None
+        vectorizer = None
+        print(f"Error loading model resources: {exc}")
+
+    try:
+        if os.path.exists(whitelist_path):
+            df = pd.read_csv(whitelist_path, header=None)
+            if not df.empty:
+                trusted_domains = set(df[0].astype(str).str.lower().values)
+        else:
+            print("Trusted domains file not found.")
+    except Exception as exc:
+        trusted_domains = set()
+        print(f"Error loading trusted domains: {exc}")
+
+
 load_resources()
-print("DEBUG: load_resources finished.")
 
 class EmailRequest(BaseModel):
     sender: str
     subject: str
     body: str
-
-STOPWORDS = set(stopwords.words('english'))
 
 def preprocess_text(text):
     if not isinstance(text, str):
