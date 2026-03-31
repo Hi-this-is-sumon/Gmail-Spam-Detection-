@@ -125,25 +125,38 @@ Server will run on [http://127.0.0.1:8000](http://127.0.0.1:8000)
 
 ```
 Gmail-Spam-Detection-/
+├── api/
+│   └── index.py                 # Vercel entry point
 ├── backend/
 │   ├── data/
-│   │   ├── spam.csv           # Training dataset
-│   │   └── trusted_domains.csv # Whitelist
+│   │   ├── spam.csv             # Training dataset
+│   │   ├── trusted_domains.csv  # Trusted domain list
+│   │   └── whitelist.csv        # Additional whitelist data
 │   ├── model/
-│   │   ├── train_model.py     # ML model training
-│   │   ├── spam_model.pkl     # Trained model
-│   │   └── vectorizer.pkl     # TF-IDF vectorizer
-│   ├── app.py                 # FastAPI server
-│   ├── requirements.txt       # Python dependencies
-│   └── verify_model.py        # Model testing
+│   │   ├── train_model.py       # ML model training
+│   │   ├── spam_model.pkl       # Trained model
+│   │   └── vectorizer.pkl       # TF-IDF vectorizer
+│   ├── static/
+│   │   └── landing.css          # Landing page styles
+│   ├── templates/
+│   │   └── index.html           # Landing page HTML
+│   ├── app.py                   # FastAPI server
+│   ├── requirements.txt         # Backend Python dependencies
+│   ├── README_backend.md        # Backend notes
+│   └── verify_model.py          # Model testing
 ├── extension/
-│   ├── assets/                # Icons
-│   ├── manifest.json          # Extension config
-│   ├── popup.html            # Popup UI
-│   ├── popup.css             # Styles & animations
-│   ├── popup.js              # Popup logic
-│   ├── content.js            # Gmail integration
-│   └── background.js         # Service worker
+│   ├── assets/                  # Icons
+│   ├── utils/
+│   │   └── domParser.js         # Gmail DOM helper
+│   ├── manifest.json            # Extension config
+│   ├── popup.html               # Popup UI
+│   ├── popup.css                # Styles & animations
+│   ├── popup.js                 # Popup logic
+│   ├── content.js               # Gmail integration
+│   └── background.js            # Service worker
+├── requirements.txt             # Root deployment dependencies
+├── vercel.json                  # Vercel deployment config
+├── LICENSE
 └── README.md
 ```
 
@@ -193,7 +206,7 @@ This project is licensed under the **MIT License**. See the [`LICENSE`](LICENSE)
 **Sumon Mandal**   
 GitHub: [@Hi-this-is-sumon](https://github.com/Hi-this-is-sumon)
 
-Built as a final project for Secure & Intelligent Computing (SIC) course.
+Built as a **Lab Project** for **B.Tech(CSE) Machine Learning Subject**.
 
 ---
 
