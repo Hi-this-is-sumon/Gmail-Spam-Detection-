@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
 import pickle
 import pandas as pd
 import re
@@ -31,6 +32,217 @@ vectorizer = None
 trusted_domains = set()
 ps = PorterStemmer()
 STOPWORDS = set(ENGLISH_STOP_WORDS)
+
+INSTALL_PAGE_HTML = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gmail Spam Detection</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #081120, #142b4d, #1d4ed8);
+            color: #ffffff;
+        }
+        .container {
+            max-width: 1120px;
+            margin: 0 auto;
+            padding: clamp(16px, 3vw, 48px);
+        }
+        .hero {
+            display: grid;
+            grid-template-columns: 1.3fr 0.9fr;
+            gap: 20px;
+            align-items: stretch;
+            margin-bottom: 20px;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 18px;
+            padding: clamp(18px, 2.5vw, 28px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(8px);
+        }
+        h1 {
+            margin: 0 0 12px;
+            font-size: clamp(2rem, 4vw, 3rem);
+            line-height: 1.15;
+        }
+        h2 {
+            margin-top: 0;
+            font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+        }
+        p {
+            margin: 0 0 12px;
+            color: #e5eefc;
+        }
+        .badge {
+            display: inline-block;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(34, 197, 94, 0.18);
+            border: 1px solid rgba(34, 197, 94, 0.35);
+            margin-bottom: 14px;
+            font-size: 0.95rem;
+        }
+        .buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 18px;
+        }
+        .btn {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 46px;
+            padding: 12px 18px;
+            border-radius: 10px;
+            background: #22c55e;
+            color: #081120;
+            text-decoration: none;
+            font-weight: bold;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+        }
+        .btn:hover {
+            transform: translateY(-1px);
+            opacity: 0.95;
+        }
+        .btn.secondary {
+            background: #e2e8f0;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+        .stat {
+            border-radius: 12px;
+            padding: 14px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .stat strong {
+            display: block;
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
+        }
+        ol, ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        li + li {
+            margin-top: 8px;
+        }
+        code {
+            background: rgba(0, 0, 0, 0.25);
+            padding: 2px 6px;
+            border-radius: 6px;
+            word-break: break-word;
+        }
+        @media (max-width: 900px) {
+            .hero,
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        @media (max-width: 640px) {
+            .container {
+                padding: 14px;
+            }
+            .buttons {
+                flex-direction: column;
+            }
+            .btn {
+                width: 100%;
+            }
+            .stats {
+                grid-template-columns: 1fr;
+            }
+            .card {
+                border-radius: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="hero">
+            <div class="card">
+                <div class="badge">✅ Easy to install • No login required</div>
+                <h1>📧 Gmail Spam Detection</h1>
+                <p>AI-powered Chrome extension for detecting spam emails in Gmail with a clean, simple workflow for users.</p>
+                <p><strong>No login or registration required.</strong> Just download, load the extension, and start scanning emails.</p>
+                <div class="buttons">
+                    <a class="btn" href="https://github.com/Hi-this-is-sumon/Gmail-Spam-Detection-/archive/refs/heads/main.zip">Download ZIP</a>
+                    <a class="btn secondary" href="https://github.com/Hi-this-is-sumon/Gmail-Spam-Detection-">GitHub Repo</a>
+                    <a class="btn secondary" href="/docs">API Docs</a>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Quick Info</h2>
+                <div class="stats">
+                    <div class="stat">
+                        <strong>Platform</strong>
+                        Chrome Extension
+                    </div>
+                    <div class="stat">
+                        <strong>Backend</strong>
+                        Live on Vercel
+                    </div>
+                    <div class="stat">
+                        <strong>Setup</strong>
+                        Load unpacked
+                    </div>
+                    <div class="stat">
+                        <strong>Use Case</strong>
+                        Gmail spam check
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h2>🚀 Install in Chrome</h2>
+                <ol>
+                    <li>Download and extract the ZIP file.</li>
+                    <li>Open <code>chrome://extensions/</code> in Chrome.</li>
+                    <li>Turn on <strong>Developer mode</strong>.</li>
+                    <li>Click <strong>Load unpacked</strong>.</li>
+                    <li>Select the <code>extension</code> folder.</li>
+                    <li>Pin the extension and start using it in Gmail.</li>
+                </ol>
+            </div>
+
+            <div class="card">
+                <h2>📝 How to Use</h2>
+                <ul>
+                    <li>Open any email in Gmail.</li>
+                    <li>Click the extension icon.</li>
+                    <li>Use <strong>Get from Gmail</strong> or paste email text manually.</li>
+                    <li>Click <strong>Analyze</strong> to detect spam.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+"""
 
 
 def load_resources():
@@ -140,8 +352,13 @@ def has_spam_indicators(subject, body):
     # If 2+ strong spam indicators, definitely spam
     return spam_count >= 2
 
-@app.get("/")
+@app.get("/", response_class=HTMLResponse)
 def home():
+    return INSTALL_PAGE_HTML
+
+
+@app.get("/health")
+def health():
     return {"message": "Spam Detector API is running"}
 
 @app.post("/predict")
