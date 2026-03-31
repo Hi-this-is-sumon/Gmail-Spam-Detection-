@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultContent = document.getElementById('result-content');
     const loaderContainer = document.querySelector('.loader-container');
     const API_BASE_URLS = [
+        'https://gmail-spam-detection-nine.vercel.app',
         'https://gmail-spam-detection-theta.vercel.app',
         'http://localhost:8000'
     ];
