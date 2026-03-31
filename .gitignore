@@ -39,8 +39,10 @@ env/
 .DS_Store
 Thumbs.db
 
-# Model files (too large for git)
+# Model files
 *.pkl
+!backend/model/spam_model.pkl
+!backend/model/vectorizer.pkl
 
 # Logs
 *.log

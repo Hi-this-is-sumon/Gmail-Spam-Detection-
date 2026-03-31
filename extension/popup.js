@@ -5,6 +5,35 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultBox = document.getElementById('result');
     const resultContent = document.getElementById('result-content');
     const loaderContainer = document.querySelector('.loader-container');
+    const API_BASE_URLS = [
+        'https://gmail-spam-detection-theta.vercel.app',
+        'http://localhost:8000'
+    ];
+
+    async function analyzeEmail(payload) {
+        let lastError = null;
+
+        for (const baseUrl of API_BASE_URLS) {
+            try {
+                const response = await fetch(`${baseUrl}/predict`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`${baseUrl} returned ${response.status}: ${errorText}`);
+                }
+
+                return await response.json();
+            } catch (error) {
+                lastError = error;
+            }
+        }
+
+        throw lastError || new Error('No backend is reachable.');
+    }
 
     // 1. Get from Gmail
     btnGet.addEventListener('click', async () => {
@@ -50,14 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loaderContainer.classList.remove('hidden');
 
         try {
-            const response = await fetch("http://localhost:8000/predict", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ sender, subject, body })
-            });
-
-            const data = await response.json();
-
+            const data = await analyzeEmail({ sender, subject, body });
 
             // UI State: Result
             loaderContainer.classList.add('hidden');
@@ -98,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
             loaderContainer.classList.add('hidden');
             resultContent.classList.remove('hidden');
             document.getElementById('label').innerText = "ERROR";
-            document.getElementById('reason').innerText = "Could not connect to backend. Make sure the server is running.";
+            document.getElementById('reason').innerText = "Could not connect to the deployed or local backend. Check the Vercel deployment or local server.";
             // Reset confidence bar
             document.getElementById('confidence-fill').style.width = '0%';
             document.getElementById('confidence').innerText = '';
