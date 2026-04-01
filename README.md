@@ -206,7 +206,7 @@ This project is licensed under the **MIT License**. See the [`LICENSE`](LICENSE)
 **Sumon Mandal**   
 GitHub: [@Hi-this-is-sumon](https://github.com/Hi-this-is-sumon)
 
-Built as a **Lab Project** for **B.Tech(CSE) Machine Learning Subject**.
+This project is developed as part of the **B.Tech(CSE) Machine Learning Lab Project**.
 
 ---
 

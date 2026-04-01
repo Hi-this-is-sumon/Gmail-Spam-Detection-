@@ -1,8 +1,9 @@
 {
     "manifest_version": 3,
     "name": "Gmail Spam Detector",
-    "version": "1.0",
-    "description": "Detects spam emails in Gmail using ML.",
+    "version": "1.1",
+    "description": "Detects spam emails in Gmail using a deployed AI backend.",
+    "homepage_url": "https://gmail-spam-detection-nine.vercel.app/",
     "permissions": [
         "activeTab",
         "scripting",
